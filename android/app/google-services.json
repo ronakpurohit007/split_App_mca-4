@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261854631304",
+    "project_id": "split-application-123",
+    "storage_bucket": "split-application-123.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261854631304:android:2c36f21f5f27cf32ded63d",
+        "android_client_info": {
+          "package_name": "com.example.login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8mkQcn9-_qyipsC0zgDCn2McZtXiLqcY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
