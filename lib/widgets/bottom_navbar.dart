@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login/demo/test.dart';
 import '../Home/home.dart';
 import '../profile/profile.dart';
 import '../search/search.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
     SearchMemberScreen(selectedMembers: []),
-    // NotificationsScreen(),
+    DemoTest(),
     ProfileScreen(),
   ];
 
