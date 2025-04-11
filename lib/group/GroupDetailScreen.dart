@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:login/split/price_split.dart';
 import 'package:login/widgets/AppBar.dart';
 import 'package:login/widgets/category_utils.dart';
 import 'package:login/widgets/colors.dart';
 import 'package:login/widgets/logger.dart';
 
-
-final ConsoleAppLogger logger = ConsoleAppLogger(); 
+final ConsoleAppLogger logger = ConsoleAppLogger();
 
 class GroupDetailScreen extends StatelessWidget {
   final String groupId;
@@ -22,13 +22,11 @@ class GroupDetailScreen extends StatelessWidget {
     required this.category,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
-    
-     logger.d("Group Details -> ID: $groupId, Title: $title, Category: $category, Members: $members");
-     
+    logger.d(
+        "Group Details -> ID: $groupId, Title: $title, Category: $category, Members: $members");
+
     return Scaffold(
       appBar: CustomAppBar(
           title: "${CategoryUtils.getCategoryEmoji(category)} $title"),
@@ -58,6 +56,42 @@ class GroupDetailScreen extends StatelessWidget {
             Text(
               description,
               style: TextStyle(fontSize: 16, color: Colors.white70),
+            ),
+            SizedBox(height: 20),
+            // Add Expense Button
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PriceScreen(groupId: groupId),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.mainShadow,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.gray),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.attach_money, color: AppColors.main),
+                    SizedBox(width: 8),
+                    Text(
+                      "Manage Expenses",
+                      style: TextStyle(
+                        color: AppColors.main,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             SizedBox(height: 20),
             Text(
