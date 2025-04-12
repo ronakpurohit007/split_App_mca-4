@@ -2539,6 +2539,7 @@
 // lib/screens/price_screen.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:login/split/show_split.dart';
 import 'package:login/widgets/AppBar.dart';
 import 'package:login/widgets/colors.dart';
 import 'package:login/widgets/login_btn.dart';
@@ -3372,11 +3373,85 @@ class _PriceScreenState extends State<PriceScreen> {
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showActionsSheet, // Changed to show the action sheet
-        backgroundColor: AppColors.main,
-        child: Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // Receipt/statement button
+          FloatingActionButton(
+            onPressed: () {
+              // Add your receipt/statement functionality here
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SplitExpensesScreen(
+                    groupId: widget.groupId,
+                    groupTitle: '',
+                    members: members,
+                  ),
+                ),
+              );
+            },
+            backgroundColor: AppColors.main,
+            heroTag: "receiptButton",
+            child: Icon(Icons.receipt, color: Colors.white),
+          ),
+          SizedBox(height: 16), // Space between buttons
+          // Add expense button
+          FloatingActionButton(
+            onPressed: _showActionsSheet,
+            backgroundColor: AppColors.main,
+            heroTag: "addButton",
+            child: Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
+    );
+  }
+
+// Add this method to your class for the receipt functionality
+  void _showReceiptView() {
+    // Implement functionality for viewing receipts or statements
+    // This could be a summary view, reports, etc.
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.mainShadow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Expense Summary",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20),
+              // Add your receipt/statement content here
+              Text(
+                "Total Spent: ₹${totalAmount.toStringAsFixed(2)}",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              // Add more summary content as needed
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: AppColors.main),
+                child: Text("Close", style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

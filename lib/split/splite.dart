@@ -34,6 +34,8 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
   SplitMethod selectedMethod = SplitMethod.equal;
   double totalAmount = 0.0;
   bool isLoading = false;
+  String groupTitle = "Group"; // Default value before fetching
+  bool isCalculated = false; // Flag to track if calculation was performed
 
   // Store individual member split info
   Map<String, double> memberShares = {};
@@ -50,7 +52,37 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
 
     // Set total amount from expenses screen
     totalAmount = widget.totalAmount;
-    _updateCalculation();
+
+    // For equal split, calculate immediately since no input is needed
+    if (selectedMethod == SplitMethod.equal) {
+      _updateCalculation();
+      isCalculated = true;
+    }
+
+    // Fetch group title
+    _fetchGroupTitle();
+  }
+
+  // Fetch group title from Firestore
+  Future<void> _fetchGroupTitle() async {
+    try {
+      DocumentSnapshot groupDoc = await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .get();
+
+      if (groupDoc.exists && groupDoc.data() != null) {
+        Map<String, dynamic> groupData =
+            groupDoc.data() as Map<String, dynamic>;
+        if (groupData.containsKey('title')) {
+          setState(() {
+            groupTitle = groupData['title'];
+          });
+        }
+      }
+    } catch (e) {
+      logger.e("Error fetching group title: $e");
+    }
   }
 
   @override
@@ -183,12 +215,26 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
         _calculateRatioSplit();
         break;
     }
+
+    setState(() {
+      isCalculated = true;
+    });
+  }
+
+  // Get split method as string
+  String _getSplitMethodString() {
+    return selectedMethod.toString().split('.').last;
   }
 
   // Save the split expenses to Firestore
   Future<String> _saveSplitExpenses() async {
     if (totalAmount <= 0) {
       SnackbarUtils.showErrorSnackbar(context, "Please enter a valid amount");
+      return '';
+    }
+
+    if (!isCalculated) {
+      SnackbarUtils.showErrorSnackbar(context, "Please calculate first");
       return '';
     }
 
@@ -207,16 +253,19 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
           .collection('expenses')
           .doc();
 
+      // Get the split method as string
+      String splitMethodStr = _getSplitMethodString();
+
       batch.set(mainExpenseRef, {
         'title': "Split Expense",
         'price': totalAmount,
-        'user': "Group", // Use "Group" since there's no specific payer
+        'user': groupTitle, // Use group title as payer
         'createdAt': Timestamp.now(),
         'isSplit': true,
-        'splitMethod': selectedMethod.toString().split('.').last,
+        'splitMethod': splitMethodStr, // Store the split method
       });
 
-      // Save individual splits as separate documents
+      // Save individual splits as separate documents with the same expense ID
       for (String member in widget.members) {
         if (memberShares[member]! > 0) {
           DocumentReference splitRef = FirebaseFirestore.instance
@@ -228,11 +277,12 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
           batch.set(splitRef, {
             'expenseId': mainExpenseRef.id,
             'title': "Split Expense",
-            'payer': "Group",
+            'payer': groupTitle, // Use group title as payer
             'recipient': member,
             'amount': memberShares[member],
             'settled': false,
             'createdAt': Timestamp.now(),
+            'splitMethod': splitMethodStr, // Store the split method
           });
         }
       }
@@ -295,7 +345,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                       style: pw.TextStyle(fontSize: 12),
                     ),
                     pw.Text(
-                      "Group ID: ${widget.groupId}",
+                      "Group: $groupTitle",
                       style: pw.TextStyle(fontSize: 12),
                     ),
                   ],
@@ -318,12 +368,13 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                       ),
                       pw.SizedBox(height: 5),
                       pw.Text(
-                        "Total Amount: ₹${totalAmount.toStringAsFixed(2)}",
+                        "Total Amount: Rs.${totalAmount.toStringAsFixed(2)}",
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                       ),
                       pw.SizedBox(height: 5),
                       pw.Text(
-                        "Split Method: ${selectedMethod.toString().split('.').last.toUpperCase()}",
+                        "Split Method: ${_getSplitMethodString().toUpperCase()}",
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                       ),
                     ],
                   ),
@@ -352,7 +403,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                         pw.Padding(
                           padding: pw.EdgeInsets.all(5),
                           child: pw.Text(
-                            "Amount (₹)",
+                            "Amount (Rs.)",
                             style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                           ),
                         ),
@@ -408,12 +459,20 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
 
   // Reset the input fields
   void _resetFields() {
-    for (String member in widget.members) {
-      memberControllers[member]?.clear();
-      memberShares[member] = 0.0;
-    }
+    setState(() {
+      for (String member in widget.members) {
+        memberControllers[member]?.clear();
+        memberShares[member] = 0.0;
+      }
 
-    _updateCalculation();
+      isCalculated = false;
+
+      // For equal split, recalculate immediately
+      if (selectedMethod == SplitMethod.equal) {
+        _updateCalculation();
+        isCalculated = true;
+      }
+    });
   }
 
   // Show split bill result screen
@@ -426,7 +485,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
           expenseId: expenseId,
           title: "Split Expense",
           totalAmount: totalAmount,
-          payer: "Group", // Use "Group" since there's no specific payer
+          payer: groupTitle, // Use group title as payer
           memberShares: memberShares,
           splitMethod: selectedMethod,
           onPrintPressed: _generateAndPrintPdf,
@@ -460,7 +519,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                     Expanded(
                       flex: 1,
                       child: Text(
-                        "₹${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
+                        "Rs.${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
                         style: TextStyle(color: Colors.amber),
                         textAlign: TextAlign.right,
                       ),
@@ -527,14 +586,15 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                                   borderSide: BorderSide(color: AppColors.main),
                                 ),
                               ),
-                              onChanged: (_) => _updateCalculation(),
                             ),
                     ),
                     SizedBox(width: 8),
-                    Text(
-                      "₹${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
-                      style: TextStyle(color: Colors.amber),
-                    ),
+                    isCalculated
+                        ? Text(
+                            "Rs.${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
+                            style: TextStyle(color: Colors.amber),
+                          )
+                        : Container(),
                   ],
                 ),
               );
@@ -575,7 +635,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                                 ),
                               ),
                               child: Text(
-                                "₹${memberControllers[member]?.text ?? '0.00'}",
+                                "Rs.${memberControllers[member]?.text ?? '0.00'}",
                                 style: TextStyle(color: Colors.white70),
                                 textAlign: TextAlign.center,
                               ),
@@ -586,7 +646,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                                   decimal: true),
                               style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                prefixText: "₹",
+                                prefixText: "Rs.",
                                 prefixStyle: TextStyle(color: Colors.white70),
                                 hintText: "0.00",
                                 hintStyle: TextStyle(color: AppColors.gray),
@@ -597,7 +657,6 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                                   borderSide: BorderSide(color: AppColors.main),
                                 ),
                               ),
-                              onChanged: (_) => _updateCalculation(),
                             ),
                     ),
                   ],
@@ -641,14 +700,15 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                             borderSide: BorderSide(color: AppColors.main),
                           ),
                         ),
-                        onChanged: (_) => _updateCalculation(),
                       ),
                     ),
                     SizedBox(width: 8),
-                    Text(
-                      "₹${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
-                      style: TextStyle(color: Colors.amber),
-                    ),
+                    isCalculated
+                        ? Text(
+                            "Rs.${memberShares[member]?.toStringAsFixed(2) ?? '0.00'}",
+                            style: TextStyle(color: Colors.amber),
+                          )
+                        : Container(),
                   ],
                 ),
               );
@@ -686,7 +746,7 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "₹${totalAmount.toStringAsFixed(2)}",
+                          "Rs.${totalAmount.toStringAsFixed(2)}",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -737,6 +797,17 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
 
                   // Input fields based on selected method
                   _buildInputFields(),
+                  SizedBox(height: 16),
+
+                  // Calculate button (only show for percentage, amount, and ratio)
+                  if (selectedMethod != SplitMethod.equal)
+                    Container(
+                      width: double.infinity,
+                      child: CustomMainButton(
+                        text: "Calculate",
+                        onPressed: _updateCalculation,
+                      ),
+                    ),
                   SizedBox(height: 24),
 
                   // Action buttons
@@ -793,7 +864,14 @@ class _SplitBillScreenState extends State<SplitBillScreen> {
             memberControllers[member]?.clear();
           }
 
-          _updateCalculation();
+          // Reset calculated flag
+          isCalculated = false;
+
+          // For equal split, calculate immediately since no input is needed
+          if (method == SplitMethod.equal) {
+            _updateCalculation();
+            isCalculated = true;
+          }
         });
       },
       borderRadius: BorderRadius.circular(10),
@@ -935,7 +1013,7 @@ class SplitBillResultScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          "Total Amount: ₹${totalAmount.toStringAsFixed(2)}",
+                          "Total Amount: Rs.${totalAmount.toStringAsFixed(2)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -987,7 +1065,7 @@ class SplitBillResultScreen extends StatelessWidget {
                         Expanded(
                           flex: 1,
                           child: Text(
-                            "Amount (₹)",
+                            "Amount (Rs.)",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,

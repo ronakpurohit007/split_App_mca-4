@@ -43,6 +43,8 @@ dependencies:
   pdf: ^3.11.3
   intl: ^0.20.2
   printing: ^5.14.2
+  google_fonts: ^4.0.3
+  pdf_widgets_google_fonts: ^0.0.5
 #  google_sign_in: ^5.0.0
 
 dev_dependencies:

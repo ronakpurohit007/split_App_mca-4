@@ -18,11 +18,9 @@ class PrintExpenseScreen extends StatefulWidget {
   final String groupId;
   final List<String> members;
 
-  const PrintExpenseScreen({
-    Key? key, 
-    required this.groupId, 
-    required this.members
-  }) : super(key: key);
+  const PrintExpenseScreen(
+      {Key? key, required this.groupId, required this.members})
+      : super(key: key);
 
   @override
   _PrintExpenseScreenState createState() => _PrintExpenseScreenState();
@@ -33,21 +31,21 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
   String selectedMember = 'All';
   List<Map<String, dynamic>> expenses = [];
   String groupName = '';
-  
+
   @override
   void initState() {
     super.initState();
     _fetchGroupInfo();
     _fetchExpenses();
   }
-  
+
   Future<void> _fetchGroupInfo() async {
     try {
       DocumentSnapshot groupDoc = await FirebaseFirestore.instance
           .collection('groups')
           .doc(widget.groupId)
           .get();
-      
+
       if (groupDoc.exists) {
         var data = groupDoc.data() as Map<String, dynamic>;
         setState(() {
@@ -58,7 +56,7 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
       logger.e("Error fetching group info: $e");
     }
   }
-  
+
   Future<void> _fetchExpenses() async {
     setState(() => isLoading = true);
     try {
@@ -92,27 +90,30 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
     if (selectedMember == 'All') {
       return expenses;
     } else {
-      return expenses.where((expense) => expense['user'] == selectedMember).toList();
+      return expenses
+          .where((expense) => expense['user'] == selectedMember)
+          .toList();
     }
   }
 
   double _getFilteredTotal() {
     List<Map<String, dynamic>> filteredExpenses = _getFilteredExpenses();
-    return filteredExpenses.fold(0.0, (sum, expense) => sum + (expense['price'] as num).toDouble());
+    return filteredExpenses.fold(
+        0.0, (sum, expense) => sum + (expense['price'] as num).toDouble());
   }
 
   Future<void> _generateAndOpenPdf() async {
     setState(() => isLoading = true);
-    
+
     try {
       final pdf = pw.Document();
       final filteredExpenses = _getFilteredExpenses();
       final totalAmount = _getFilteredTotal();
-      
+
       // Get current date for the receipt
       final now = DateTime.now();
       final formattedDate = "${now.day}/${now.month}/${now.year}";
-      
+
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
@@ -128,24 +129,26 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text('EXPENSE REPORT', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-                        pw.Text('Date: $formattedDate', style: pw.TextStyle(fontSize: 12))
+                        pw.Text('EXPENSE REPORT',
+                            style: pw.TextStyle(
+                                fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                        pw.Text('Date: $formattedDate',
+                            style: pw.TextStyle(fontSize: 12))
                       ],
                     ),
                     pw.SizedBox(height: 10),
                     pw.Text(groupName, style: pw.TextStyle(fontSize: 18)),
                     pw.SizedBox(height: 5),
                     pw.Text(
-                      selectedMember == 'All' 
-                          ? 'All Members' 
-                          : 'Member: $selectedMember',
-                      style: pw.TextStyle(fontSize: 14)
-                    ),
+                        selectedMember == 'All'
+                            ? 'All Members'
+                            : 'Member: $selectedMember',
+                        style: pw.TextStyle(fontSize: 14)),
                     pw.Divider(thickness: 2),
                   ],
                 ),
               ),
-              
+
               // Summary
               pw.Container(
                 padding: pw.EdgeInsets.all(10),
@@ -156,13 +159,16 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('SUMMARY', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Text('SUMMARY',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                     pw.SizedBox(height: 5),
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text('Total Expenses:'),
-                        pw.Text('₹${totalAmount.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.Text('Rs.${totalAmount.toStringAsFixed(2)}',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                       ],
                     ),
                     pw.SizedBox(height: 5),
@@ -170,22 +176,25 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text('Number of Items:'),
-                        pw.Text('${filteredExpenses.length}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.Text('${filteredExpenses.length}',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                       ],
                     ),
                   ],
                 ),
               ),
-              
+
               pw.SizedBox(height: 20),
-              
+
               // Expense Details Table
               pw.Table.fromTextArray(
-                headers: ['Date', 'Description', 'Added By', 'Amount (₹)'],
+                headers: ['Date', 'Description', 'Added By', 'Amount (Rs.)'],
                 data: filteredExpenses.map((expense) {
                   final date = (expense['createdAt'] as Timestamp).toDate();
-                  final formattedDate = "${date.day}/${date.month}/${date.year}";
-                  
+                  final formattedDate =
+                      "${date.day}/${date.month}/${date.year}";
+
                   return [
                     formattedDate,
                     expense['title'],
@@ -203,9 +212,9 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                   3: pw.Alignment.centerRight,
                 },
               ),
-              
+
               pw.SizedBox(height: 20),
-              
+
               // Total at bottom
               pw.Container(
                 alignment: pw.Alignment.centerRight,
@@ -218,50 +227,53 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                   child: pw.Row(
                     mainAxisSize: pw.MainAxisSize.min,
                     children: [
-                      pw.Text('TOTAL: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.Text('₹${totalAmount.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text('TOTAL: ',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.Text('Rs.${totalAmount.toStringAsFixed(2)}',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                     ],
                   ),
                 ),
               ),
-              
+
               // Footer
               pw.SizedBox(height: 40),
               pw.Footer(
                 trailing: pw.Text(
                   'Generated via ExpenseTracker App',
-                  style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+                  style: pw.TextStyle(
+                      fontSize: 10, fontStyle: pw.FontStyle.italic),
                 ),
               ),
             ];
           },
         ),
       );
-      
+
       // Save PDF
       final output = await getTemporaryDirectory();
-      final String fileName = 'expenses_${selectedMember == 'All' ? 'all' : selectedMember}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final String fileName =
+          'expenses_${selectedMember == 'All' ? 'all' : selectedMember}_${DateTime.now().millisecondsSinceEpoch}.pdf';
       final file = File('${output.path}/$fileName');
       await file.writeAsBytes(await pdf.save());
-      
+
       // Open PDF
       await OpenFile.open(file.path);
-      
+
       setState(() => isLoading = false);
       SnackbarUtils.showSuccessSnackbar(context, "PDF generated successfully");
-      
     } catch (e) {
       setState(() => isLoading = false);
       logger.e("Error generating PDF: $e");
       SnackbarUtils.showErrorSnackbar(context, "Failed to generate PDF");
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Print Expenses"),
-      body: isLoading 
+      body: isLoading
           ? Center(child: CircularProgressIndicator(color: AppColors.main))
           : Padding(
               padding: const EdgeInsets.all(16.0),
@@ -295,9 +307,9 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Select Member
                   Text(
                     "Select Member",
@@ -308,7 +320,7 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
+
                   // Member selection chips
                   Container(
                     height: 50,
@@ -323,7 +335,8 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                             });
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             margin: EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
                               color: selectedMember == 'All'
@@ -347,7 +360,7 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                             ),
                           ),
                         ),
-                        
+
                         // Individual member chips
                         ...widget.members.map((member) {
                           return GestureDetector(
@@ -357,7 +370,8 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                               });
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
                               margin: EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
                                 color: selectedMember == member
@@ -385,9 +399,9 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Preview information
                   Container(
                     padding: EdgeInsets.all(16),
@@ -411,7 +425,8 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Items:", style: TextStyle(color: Colors.white70)),
+                            Text("Items:",
+                                style: TextStyle(color: Colors.white70)),
                             Text(
                               "${_getFilteredExpenses().length}",
                               style: TextStyle(color: Colors.white),
@@ -422,9 +437,10 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Total Amount:", style: TextStyle(color: Colors.white70)),
+                            Text("Total Amount:",
+                                style: TextStyle(color: Colors.white70)),
                             Text(
-                              "₹${_getFilteredTotal().toStringAsFixed(2)}",
+                              "Rs.${_getFilteredTotal().toStringAsFixed(2)}",
                               style: TextStyle(
                                 color: Colors.amber,
                                 fontWeight: FontWeight.bold,
@@ -435,9 +451,9 @@ class _PrintExpenseScreenState extends State<PrintExpenseScreen> {
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(height: 32),
-                  
+
                   // Generate PDF Button
                   CustomMainButton(
                     width: double.infinity,
