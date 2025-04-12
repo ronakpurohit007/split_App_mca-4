@@ -37,7 +37,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     });
   }
 
-
   /// Fetch all members from Firestore (Array inside Document)
   void _fetchAllMembers() async {
     setState(() {
@@ -81,21 +80,20 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   }
 
   /// Search & filter members
-void _filterMembers() {
-  String query = nameController.text.trim().toLowerCase();
-  setState(() {
-    if (query.isEmpty) {
-      filteredMembers = [];
-    } else {
-      filteredMembers = allMembers
-          .where((member) => member.toLowerCase().contains(query))
-          .toList();
-    }
-  });
+  void _filterMembers() {
+    String query = nameController.text.trim().toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        filteredMembers = [];
+      } else {
+        filteredMembers = allMembers
+            .where((member) => member.toLowerCase().contains(query))
+            .toList();
+      }
+    });
 
-  print("Filtered Members: $filteredMembers");
-}
-
+    print("Filtered Members: $filteredMembers");
+  }
 
   void _fetchCurrentUser() async {
     try {
@@ -153,7 +151,7 @@ void _filterMembers() {
     if (currentUser == null) return;
 
     DocumentReference docRef =
-    FirebaseFirestore.instance.collection("members").doc(currentUser!.uid);
+        FirebaseFirestore.instance.collection("members").doc(currentUser!.uid);
 
     DocumentSnapshot docSnapshot = await docRef.get();
 
@@ -169,8 +167,6 @@ void _filterMembers() {
 
     Navigator.pop(context, members); // Send members back to Create Group Screen
   }
-
-
 
   Future<void> _updateMembersInFirestore() async {
     if (currentUser == null) return;
@@ -258,9 +254,8 @@ void _filterMembers() {
                   children: [
                     Container(
                       constraints: BoxConstraints(
-                        maxHeight: members.length > 3
-                            ? 200
-                            : members.length * 61.0, 
+                        maxHeight:
+                            members.length > 3 ? 200 : members.length * 61.0,
                       ),
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -268,7 +263,7 @@ void _filterMembers() {
                             ? BouncingScrollPhysics()
                             : NeverScrollableScrollPhysics(),
                         itemCount: members.length,
-                        itemBuilder: (context, index){
+                        itemBuilder: (context, index) {
                           return Card(
                             color: AppColors.mainShadow,
                             shape: RoundedRectangleBorder(
@@ -279,7 +274,7 @@ void _filterMembers() {
                               padding: EdgeInsets.all(3),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -308,11 +303,9 @@ void _filterMembers() {
                                     color: AppColors.black,
                                     shape: RoundedRectangleBorder(
                                       side: BorderSide(
-                                          color: AppColors.gray,
-                                          width: 1),
+                                          color: AppColors.gray, width: 1),
                                       borderRadius: BorderRadius.all(
-                                          Radius.circular(
-                                              8),
+                                        Radius.circular(8),
                                       ), // Rounded corners
                                     ),
                                     itemBuilder: (BuildContext context) {
@@ -347,7 +340,7 @@ void _filterMembers() {
                                     },
                                     child: Icon(Icons.more_vert,
                                         color:
-                                        AppColors.gray), // Three-dot button
+                                            AppColors.gray), // Three-dot button
                                   ),
                                 ],
                               ),
@@ -356,7 +349,6 @@ void _filterMembers() {
                         },
                       ),
                     ),
-
                   ],
                 ),
               ),
