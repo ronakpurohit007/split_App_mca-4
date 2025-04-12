@@ -741,7 +741,6 @@
 //   }
 // }
 
-
 // import 'package:flutter/material.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:login/widgets/AppBar.dart';
@@ -1238,10 +1237,10 @@
 //   }
 
 //   // New methods for added functionality
-  
+
 //   void _showPrintScreen() {
 //     String selectedMember = 'All';
-    
+
 //     showModalBottomSheet(
 //       context: context,
 //       isScrollControlled: true,
@@ -1278,7 +1277,7 @@
 //                     ),
 //                   ),
 //                   SizedBox(height: 20),
-                  
+
 //                   Text(
 //                     "Select Member",
 //                     style: TextStyle(
@@ -1287,7 +1286,7 @@
 //                     ),
 //                   ),
 //                   SizedBox(height: 10),
-                  
+
 //                   Container(
 //                     padding: EdgeInsets.symmetric(horizontal: 16),
 //                     decoration: BoxDecoration(
@@ -1322,9 +1321,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 30),
-                  
+
 //                   CustomMainButton(
 //                     width: double.infinity,
 //                     text: "Generate PDF",
@@ -1333,7 +1332,7 @@
 //                       _generatePdf(selectedMember);
 //                     },
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
 //                 ],
 //               ),
@@ -1343,7 +1342,7 @@
 //       },
 //     );
 //   }
-  
+
 //   Future<void> _generatePdf(String member) async {
 //     try {
 //       // Show loading indicator
@@ -1354,15 +1353,15 @@
 //           child: CircularProgressIndicator(color: AppColors.main),
 //         ),
 //       );
-      
+
 //       final pdf = pw.Document();
-//       final expensesToPrint = member == 'All' 
-//         ? expenses 
+//       final expensesToPrint = member == 'All'
+//         ? expenses
 //         : expenses.where((expense) => expense['user'] == member).toList();
-      
+
 //       final totalAmount = expensesToPrint.fold<double>(
 //         0, (sum, expense) => sum + (expense['price'] as num).toDouble());
-      
+
 //       // Add content to PDF
 //       pdf.addPage(
 //         pw.Page(
@@ -1375,16 +1374,16 @@
 //                   child: pw.Row(
 //                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
 //                     children: [
-//                       pw.Text('Expense Report', 
+//                       pw.Text('Expense Report',
 //                         style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
 //                       pw.Text('Date: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
 //                         style: pw.TextStyle(fontSize: 12)),
 //                     ],
 //                   ),
 //                 ),
-                
+
 //                 pw.SizedBox(height: 20),
-                
+
 //                 pw.Container(
 //                   padding: pw.EdgeInsets.all(10),
 //                   decoration: pw.BoxDecoration(
@@ -1396,17 +1395,17 @@
 //                     children: [
 //                       pw.Text('Group: $groupName', style: pw.TextStyle(fontSize: 14)),
 //                       pw.SizedBox(height: 5),
-//                       pw.Text('Member: ${member == 'All' ? 'All Members' : member}', 
+//                       pw.Text('Member: ${member == 'All' ? 'All Members' : member}',
 //                         style: pw.TextStyle(fontSize: 14)),
 //                       pw.SizedBox(height: 5),
-//                       pw.Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}', 
+//                       pw.Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
 //                         style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
 //                     ],
 //                   ),
 //                 ),
-                
+
 //                 pw.SizedBox(height: 20),
-                
+
 //                 pw.Table(
 //                   border: pw.TableBorder.all(),
 //                   columnWidths: {
@@ -1441,13 +1440,13 @@
 //                         ),
 //                       ]
 //                     ),
-                    
+
 //                     ...expensesToPrint.asMap().entries.map((entry) {
 //                       final index = entry.key;
 //                       final expense = entry.value;
 //                       DateTime date = (expense['createdAt'] as Timestamp).toDate();
 //                       String formattedDate = "${date.day}/${date.month}/${date.year}";
-                      
+
 //                       return pw.TableRow(
 //                         children: [
 //                           pw.Padding(
@@ -1461,7 +1460,7 @@
 //                               children: [
 //                                 pw.Text(expense['title']),
 //                                 pw.SizedBox(height: 2),
-//                                 pw.Text(formattedDate, 
+//                                 pw.Text(formattedDate,
 //                                   style: pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
 //                               ],
 //                             ),
@@ -1477,7 +1476,7 @@
 //                         ]
 //                       );
 //                     }).toList(),
-                    
+
 //                     pw.TableRow(
 //                       decoration: pw.BoxDecoration(color: PdfColors.grey300),
 //                       children: [
@@ -1503,9 +1502,9 @@
 //                     ),
 //                   ],
 //                 ),
-                
+
 //                 pw.SizedBox(height: 40),
-                
+
 //                 pw.Footer(
 //                   title: pw.Text(
 //                     'Generated on ${DateTime.now().toString()}',
@@ -1517,43 +1516,43 @@
 //           },
 //         ),
 //       );
-      
+
 //       // Save the PDF
 //       final output = await getTemporaryDirectory();
 //       final fileName = 'Expenses_${member == 'All' ? 'All' : member}_${DateTime.now().millisecondsSinceEpoch}.pdf';
 //       final file = File('${output.path}/$fileName');
 //       await file.writeAsBytes(await pdf.save());
-      
+
 //       // Close loading indicator
 //       Navigator.pop(context);
-      
+
 //       // Open the created PDF
 //       await OpenFile.open(file.path);
-      
+
 //       SnackbarUtils.showSuccessSnackbar(
-//         context, 
+//         context,
 //         "PDF generated successfully"
 //       );
-      
+
 //     } catch (e) {
 //       // Close loading indicator if open
 //       if (Navigator.canPop(context)) {
 //         Navigator.pop(context);
 //       }
-      
+
 //       logger.e("Error generating PDF: $e");
 //       SnackbarUtils.showErrorSnackbar(
-//         context, 
+//         context,
 //         "Failed to generate PDF"
 //       );
 //     }
 //   }
-  
+
 //   void _showCalculatorScreen() {
 //     final TextEditingController calculationController = TextEditingController();
 //     String result = '';
 //     List<String> history = [];
-    
+
 //     showModalBottomSheet(
 //       context: context,
 //       isScrollControlled: true,
@@ -1565,17 +1564,17 @@
 //       builder: (context) {
 //         return StatefulBuilder(
 //           builder: (context, setState) {
-            
+
 //             void calculateResult() {
 //               try {
 //                 // Simple expression evaluator (you may want to use a proper math parser package)
 //                 String sanitizedExpression = calculationController.text
 //                     .replaceAll('×', '*')
 //                     .replaceAll('÷', '/');
-                
+
 //                 // This is a simple evaluation - use a proper math parser for production
 //                 dynamic eval = _evaluateExpression(sanitizedExpression);
-                
+
 //                 setState(() {
 //                   result = eval.toString();
 //                   history.add('${calculationController.text} = $result');
@@ -1586,7 +1585,7 @@
 //                 });
 //               }
 //             }
-            
+
 //             return Container(
 //               height: MediaQuery.of(context).size.height * 0.8,
 //               padding: EdgeInsets.all(16),
@@ -1612,7 +1611,7 @@
 //                     ),
 //                   ),
 //                   SizedBox(height: 20),
-                  
+
 //                   // Display calculations and result
 //                   Container(
 //                     padding: EdgeInsets.all(16),
@@ -1647,9 +1646,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
-                  
+
 //                   // Calculator buttons
 //                   Expanded(
 //                     child: GridView
@@ -1764,9 +1763,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   Divider(color: AppColors.gray),
-                  
+
 //                   // History section
 //                   Container(
 //                     height: 150,
@@ -1783,7 +1782,7 @@
 //                         ),
 //                         SizedBox(height: 8),
 //                         Expanded(
-//                           child: history.isEmpty 
+//                           child: history.isEmpty
 //                             ? Center(
 //                                 child: Text(
 //                                   "No calculations yet",
@@ -1825,7 +1824,7 @@
 //       },
 //     );
 //   }
-  
+
 //   Widget _buildCalcButton(String text, Color textColor, VoidCallback onPressed) {
 //     return ElevatedButton(
 //       onPressed: onPressed,
@@ -1843,17 +1842,17 @@
 //       ),
 //     );
 //   }
-  
+
 //   // Simple expression evaluator
 //   dynamic _evaluateExpression(String expression) {
 //     // Note: This is a simplified implementation - use a proper math parser for production
 //     expression = expression.replaceAll('%', '/100*');
-    
+
 //     try {
 //       // Split by operators while preserving the operators
 //       List<String> tokens = [];
 //       String currentNumber = '';
-      
+
 //       for (int i = 0; i < expression.length; i++) {
 //         String char = expression[i];
 //         if ('+-*/'.contains(char)) {
@@ -1866,31 +1865,31 @@
 //           currentNumber += char;
 //         }
 //       }
-      
+
 //       if (currentNumber.isNotEmpty) {
 //         tokens.add(currentNumber);
 //       }
-      
+
 //       // Process * and /
 //       for (int i = 1; i < tokens.length - 1; i += 2) {
 //         if (tokens[i] == '*' || tokens[i] == '/') {
 //           double left = double.parse(tokens[i-1]);
 //           double right = double.parse(tokens[i+1]);
 //           double result;
-          
+
 //           if (tokens[i] == '*') {
 //             result = left * right;
 //           } else {
 //             result = left / right;
 //           }
-          
+
 //           tokens[i-1] = result.toString();
 //           tokens.removeAt(i);
 //           tokens.removeAt(i);
 //           i -= 2;  // Adjust index after removal
 //         }
 //       }
-      
+
 //       // Process + and -
 //       double result = double.parse(tokens[0]);
 //       for (int i = 1; i < tokens.length; i += 2) {
@@ -1901,26 +1900,26 @@
 //           result -= operand;
 //         }
 //       }
-      
+
 //       return result;
 //     } catch (e) {
 //       return 'Error';
 //     }
 //   }
-  
+
 //   void _showSplitScreen() {
 //     double totalBill = totalAmount;
 //     int numberOfPeople = members.isEmpty ? 1 : members.length;
 //     String splitMethod = 'Equal';
 //     Map<String, double> customSplits = {};
 //     Map<String, bool> includedMembers = {};
-    
+
 //     // Initialize all members as included
 //     for (var member in members) {
 //       includedMembers[member] = true;
 //       customSplits[member] = 0.0;
 //     }
-    
+
 //     showModalBottomSheet(
 //       context: context,
 //       isScrollControlled: true,
@@ -1932,12 +1931,12 @@
 //       builder: (context) {
 //         return StatefulBuilder(
 //           builder: (context, setState) {
-            
+
 //             // Calculate per person amount based on split method
 //             double calculatePerPersonAmount() {
 //               int activePeople = includedMembers.values.where((v) => v).length;
 //               if (activePeople == 0) return 0.0;
-              
+
 //               switch (splitMethod) {
 //                 case 'Equal':
 //                   return totalBill / activePeople;
@@ -1951,7 +1950,7 @@
 //                   return totalBill / activePeople;
 //               }
 //             }
-            
+
 //             return Container(
 //               height: MediaQuery.of(context).size.height * 0.85,
 //               padding: EdgeInsets.all(16),
@@ -1977,7 +1976,7 @@
 //                     ),
 //                   ),
 //                   SizedBox(height: 20),
-                  
+
 //                   // Total amount display
 //                   Container(
 //                     padding: EdgeInsets.all(16),
@@ -2007,9 +2006,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
-                  
+
 //                   // Split method selector
 //                   Container(
 //                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -2048,9 +2047,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
-                  
+
 //                   // Member selection
 //                   Text(
 //                     "Who's included?",
@@ -2060,11 +2059,11 @@
 //                       fontWeight: FontWeight.bold,
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 10),
-                  
+
 //                   Expanded(
-//                     child: members.isEmpty 
+//                     child: members.isEmpty
 //                       ? Center(
 //                           child: Text(
 //                             "No members in this group",
@@ -2087,7 +2086,7 @@
 //                                   member,
 //                                   style: TextStyle(color: Colors.white),
 //                                 ),
-//                                 trailing: splitMethod == 'Custom' 
+//                                 trailing: splitMethod == 'Custom'
 //                                   ? Container(
 //                                       width: 100,
 //                                       child: TextField(
@@ -2154,9 +2153,9 @@
 //                           },
 //                         ),
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
-                  
+
 //                   // Results section
 //                   Container(
 //                     padding: EdgeInsets.all(16),
@@ -2175,7 +2174,7 @@
 //                           ),
 //                         ),
 //                         SizedBox(height: 10),
-                        
+
 //                         if (splitMethod == 'Equal')
 //                           Row(
 //                             mainAxisAlignment: MainAxisAlignment.center,
@@ -2194,7 +2193,7 @@
 //                               ),
 //                             ],
 //                           ),
-                          
+
 //                         if (splitMethod == 'Percentage' || splitMethod == 'Custom')
 //                           Column(
 //                             children: members
@@ -2225,9 +2224,9 @@
 //                       ],
 //                     ),
 //                   ),
-                  
+
 //                   SizedBox(height: 20),
-                  
+
 //                   CustomMainButton(
 //                     width: double.infinity,
 //                     text: "Done",
@@ -2537,8 +2536,6 @@
 //   }
 // }
 
-
-
 // lib/screens/price_screen.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -2606,9 +2603,24 @@ class _PriceScreenState extends State<PriceScreen> {
     }
   }
 
-  Future<void> _fetchExpenses() async {
+  Future _fetchExpenses() async {
     setState(() => isLoading = true);
     try {
+      // Fetch the group document to get the total
+      DocumentSnapshot groupDoc = await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .get();
+
+      double storedTotal = 0.0;
+      if (groupDoc.exists) {
+        var groupData = groupDoc.data() as Map;
+        if (groupData.containsKey('totalExpenses')) {
+          storedTotal = (groupData['totalExpenses'] as num).toDouble();
+        }
+      }
+
+      // Fetch expenses for display
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('groups')
           .doc(widget.groupId)
@@ -2617,18 +2629,20 @@ class _PriceScreenState extends State<PriceScreen> {
           .get();
 
       List<Map<String, dynamic>> fetchedExpenses = [];
-      double sum = 0.0;
 
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
-        fetchedExpenses.add(data);
-        sum += (data['price'] as num).toDouble();
+
+        // Only add expenses that don't have isSplit set to true
+        if (!(data['isSplit'] == true)) {
+          fetchedExpenses.add(data);
+        }
       }
 
       setState(() {
         expenses = fetchedExpenses;
-        totalAmount = sum;
+        totalAmount = storedTotal;
         _applyFilter(selectedFilter);
         isLoading = false;
       });
@@ -2678,15 +2692,37 @@ class _PriceScreenState extends State<PriceScreen> {
 
   void _deleteExpense(String expenseId) async {
     try {
-      await FirebaseFirestore.instance
+      // First get the expense amount
+      DocumentSnapshot expenseDoc = await FirebaseFirestore.instance
           .collection('groups')
           .doc(widget.groupId)
           .collection('expenses')
           .doc(expenseId)
-          .delete();
+          .get();
 
-      SnackbarUtils.showSuccessSnackbar(context, "Expense deleted");
-      _fetchExpenses();
+      if (expenseDoc.exists) {
+        var expenseData = expenseDoc.data() as Map<String, dynamic>;
+        double expenseAmount = (expenseData['price'] as num).toDouble();
+
+        // Begin a batch write
+        WriteBatch batch = FirebaseFirestore.instance.batch();
+
+        // Delete the expense
+        batch.delete(expenseDoc.reference);
+
+        // Update the group total
+        DocumentReference groupRef =
+            FirebaseFirestore.instance.collection('groups').doc(widget.groupId);
+
+        batch.update(
+            groupRef, {'totalExpenses': FieldValue.increment(-expenseAmount)});
+
+        // Commit the batch
+        await batch.commit();
+
+        SnackbarUtils.showSuccessSnackbar(context, "Expense deleted");
+        _fetchExpenses();
+      }
     } catch (e) {
       logger.e("Error deleting expense: $e");
       SnackbarUtils.showErrorSnackbar(context, "Failed to delete expense");
@@ -2748,29 +2784,57 @@ class _PriceScreenState extends State<PriceScreen> {
               onPressed: () async {
                 String title = titleController.text.trim();
                 String user = userController.text.trim();
-                double? price = double.tryParse(priceController.text.trim());
+
+                // Ensure proper parsing of the price
+                double? newPrice = double.tryParse(priceController.text.trim());
 
                 if (title.isEmpty ||
                     user.isEmpty ||
-                    price == null ||
-                    price <= 0) {
+                    newPrice == null ||
+                    newPrice <= 0) {
                   SnackbarUtils.showErrorSnackbar(
                       context, "Please fill valid values");
                   return;
                 }
 
                 try {
-                  await FirebaseFirestore.instance
+                  // Ensure oldPrice is properly cast to double
+                  double oldPrice = (expense['price'] is double)
+                      ? expense['price']
+                      : (expense['price'] as num).toDouble();
+
+                  double priceDifference = newPrice - oldPrice;
+
+                  // Begin a batch write
+                  WriteBatch batch = FirebaseFirestore.instance.batch();
+
+                  // Update the expense
+                  DocumentReference expenseRef = FirebaseFirestore.instance
                       .collection('groups')
                       .doc(widget.groupId)
                       .collection('expenses')
-                      .doc(expense['id'])
-                      .update({
+                      .doc(expense['id']);
+
+                  batch.update(expenseRef, {
                     'title': title,
                     'user': user,
-                    'price': price,
+                    'price': newPrice,
                     'edited': true,
                   });
+
+                  // Update the group total if price changed
+                  if (priceDifference != 0) {
+                    DocumentReference groupRef = FirebaseFirestore.instance
+                        .collection('groups')
+                        .doc(widget.groupId);
+
+                    batch.update(groupRef, {
+                      'totalExpenses': FieldValue.increment(priceDifference)
+                    });
+                  }
+
+                  // Commit the batch
+                  await batch.commit();
 
                   Navigator.pop(context);
                   _fetchExpenses();
@@ -2789,6 +2853,7 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
+  // Method to add a new expense with batch operation
   void _showAddExpenseSheet() {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController priceController = TextEditingController();
@@ -2985,16 +3050,34 @@ class _PriceScreenState extends State<PriceScreen> {
                       }
 
                       try {
-                        await FirebaseFirestore.instance
+                        // Begin a batch write for atomicity
+                        WriteBatch batch = FirebaseFirestore.instance.batch();
+
+                        // Add the new expense
+                        DocumentReference expenseRef = FirebaseFirestore
+                            .instance
                             .collection('groups')
                             .doc(widget.groupId)
                             .collection('expenses')
-                            .add({
+                            .doc(); // Auto-generated ID
+
+                        batch.set(expenseRef, {
                           'title': title,
                           'price': price,
                           'user': user,
                           'createdAt': Timestamp.now(),
                         });
+
+                        // Update the group total
+                        DocumentReference groupRef = FirebaseFirestore.instance
+                            .collection('groups')
+                            .doc(widget.groupId);
+
+                        batch.update(groupRef,
+                            {'totalExpenses': FieldValue.increment(price)});
+
+                        // Commit the batch
+                        await batch.commit();
 
                         Navigator.pop(context);
                         _fetchExpenses();
@@ -3024,7 +3107,7 @@ class _PriceScreenState extends State<PriceScreen> {
     }
     return "Unknown date";
   }
-  
+
   // New method to show the action sheet with multiple buttons
   void _showActionsSheet() {
     showModalBottomSheet(
@@ -3036,6 +3119,7 @@ class _PriceScreenState extends State<PriceScreen> {
           groupId: widget.groupId,
           members: members,
           onAddExpensePressed: _showAddExpenseSheet,
+          amount: totalAmount,
         );
       },
     );

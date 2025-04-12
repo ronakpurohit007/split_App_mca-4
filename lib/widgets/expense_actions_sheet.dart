@@ -1,20 +1,21 @@
 // lib/widgets/expense_actions_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:login/other/print.dart';
-import 'package:login/other/splite.dart';
+import 'package:login/split/splite.dart';
 import 'package:login/widgets/calculator.dart';
 import 'package:login/widgets/colors.dart';
-
 
 class ExpenseActionsSheet extends StatelessWidget {
   final String groupId;
   final List<String> members;
+  final double amount;
   final Function() onAddExpensePressed;
 
   const ExpenseActionsSheet({
     Key? key,
     required this.groupId,
     required this.members,
+    required this.amount,
     required this.onAddExpensePressed,
   }) : super(key: key);
 
@@ -42,7 +43,7 @@ class ExpenseActionsSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24),
-          
+
           // Title
           Text(
             "Expense Actions",
@@ -53,7 +54,7 @@ class ExpenseActionsSheet extends StatelessWidget {
             ),
           ),
           SizedBox(height: 32),
-          
+
           // Action buttons in a row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -77,7 +78,7 @@ class ExpenseActionsSheet extends StatelessWidget {
                   );
                 },
               ),
-              
+
               // Calculator Button
               _buildActionButton(
                 context,
@@ -96,7 +97,7 @@ class ExpenseActionsSheet extends StatelessWidget {
                   );
                 },
               ),
-              
+
               // Split Button
               _buildActionButton(
                 context,
@@ -111,12 +112,13 @@ class ExpenseActionsSheet extends StatelessWidget {
                       builder: (context) => SplitBillScreen(
                         groupId: groupId,
                         members: members,
+                        totalAmount: amount, // Add this parameter
                       ),
                     ),
                   );
                 },
               ),
-              
+
               // Add Expense Button
               _buildActionButton(
                 context,
