@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           "title": doc["title"] ?? "Untitled Group",
           "description": doc["description"] ?? "No description available",
           "category": doc["category"] ?? "Other",
+          "createdBy": doc["createdBy"] ?? "Unknown",
           "members": List<String>.from(doc["members"] ?? []),
         };
       }).toList();
@@ -166,6 +167,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
+                                  SizedBox(height: 5),
+                                  // Add this section to show creator
+                                  Text(
+                                    "Created by: ${group["createdBy"]}",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.main,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
                                 ],
                               ),
                             ),

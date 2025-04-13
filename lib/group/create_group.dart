@@ -110,26 +110,25 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         "title": title.text.trim(),
         "description": discretion.text.trim(),
         "category": selectedCategory,
-        "createdBy": currentUser!.uid,
+        "createdBy": userName, // Store user's name instead of UID
+        "createdByUID": currentUser!.uid, // Also store the UID if needed
         "members": members,
         "createdAt": Timestamp.now(),
       });
+
       logger.d(
-          "Title: $title, description: $discretion, Members: $members ,category: $selectedCategory, createdBy : $currentUser,createdAt: $Timestamp.now");
+          "Title: ${title.text}, description: ${discretion.text}, Members: $members, category: $selectedCategory, createdBy: $userName, createdAt: ${Timestamp.now()}");
 
       SnackbarUtils.showSuccessSnackbar(context, "Group Created Successfully!");
       Navigator.pop(context); // Go back after creating the group
     } catch (e) {
       print("Error saving group: $e");
       SnackbarUtils.showErrorSnackbar(context, "Failed to create group!");
-      SnackbarUtils.showErrorSnackbar(context, "Failed to create group!");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    logger.d(
-        "Title: $title, description: $discretion, Members: $members ,category: $selectedCategory, createdBy : $currentUser,createdAt: $Timestamp.now");
     return Scaffold(
       appBar: CustomAppBar(title: "Create Group"),
       body: SingleChildScrollView(

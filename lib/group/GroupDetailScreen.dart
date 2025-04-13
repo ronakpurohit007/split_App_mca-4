@@ -79,10 +79,8 @@ class GroupDetailScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.attach_money, color: AppColors.main),
-                    SizedBox(width: 8),
                     Text(
-                      "Manage Expenses",
+                      " Rs. Manage Expenses",
                       style: TextStyle(
                         color: AppColors.main,
                         fontWeight: FontWeight.bold,

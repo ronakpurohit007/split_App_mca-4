@@ -1,143 +1,207 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:login/group/GroupDetailScreen.dart';
 import '../widgets/AppBar.dart';
 import '../widgets/colors.dart';
-import '../widgets/login_btn.dart';
+import '../widgets/category_utils.dart';
 
-class SearchMemberScreen extends StatefulWidget {
-  final List<String> selectedMembers;
-
-  SearchMemberScreen({required this.selectedMembers});
-
+class SearchGroupScreen extends StatefulWidget {
   @override
-  _SearchMemberScreenState createState() => _SearchMemberScreenState();
+  _SearchGroupScreenState createState() => _SearchGroupScreenState();
 }
 
-class _SearchMemberScreenState extends State<SearchMemberScreen> {
+class _SearchGroupScreenState extends State<SearchGroupScreen> {
   final TextEditingController searchController = TextEditingController();
-  List<String> allMembers = [];
-  List<String> filteredMembers = [];
+  List<Map<String, dynamic>> filteredGroups = [];
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAllMembers();
-    searchController.addListener(_filterMembers);
+    searchController.addListener(_searchGroups);
   }
 
-  /// Fetch all members from Firestore (Array inside Document)
-  void _fetchAllMembers() async {
+  /// Search for groups by title
+  void _searchGroups() async {
+    String query = searchController.text.trim().toLowerCase();
+
+    if (query.isEmpty) {
+      setState(() {
+        filteredGroups = [];
+      });
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
 
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('members')
-          .doc('F4YXH6A1ijWcUzl3lsl48m1Sg233')
+      // Query Firestore for groups where title contains the search query
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('groups')
+          .where('title', isGreaterThanOrEqualTo: query)
+          .where('title', isLessThanOrEqualTo: query + '\uf8ff')
           .get();
 
-      if (snapshot.exists) {
-        var data = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> membersArray = data['members'] ?? [];
+      // Process results
+      List<Map<String, dynamic>> groups = querySnapshot.docs.map((doc) {
+        return {
+          "id": doc.id,
+          "title": doc["title"] ?? "Untitled Group",
+          "description": doc["description"] ?? "No description available",
+          "category": doc["category"] ?? "Other",
+          "createdBy": doc["createdBy"] ?? "Unknown",
+          "members": List<String>.from(doc["members"] ?? []),
+        };
+      }).toList();
 
-        // Debugging Output
-        print("Fetched Data: $data");
-        print("Members Array: $membersArray");
+      setState(() {
+        filteredGroups = groups;
+        isLoading = false;
+      });
 
-        // Convert members to List<String>
-        setState(() {
-          allMembers = membersArray.cast<String>();
-          filteredMembers = []; // Show all initially
-          isLoading = false;
-        });
-
-        print("All Members: $allMembers");
-      } else {
-        print("No members found.");
-        setState(() {
-          isLoading = false;
-        });
-      }
+      print("Filtered Groups: ${filteredGroups.length}");
     } catch (e) {
-      print("Error fetching members: $e");
+      print("Error searching groups: $e");
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  /// Search & filter members
-void _filterMembers() {
-  String query = searchController.text.trim().toLowerCase();
-  setState(() {
-    if (query.isEmpty) {
-      filteredMembers = [];
-    } else {
-      filteredMembers = allMembers
-          .where((member) => member.toLowerCase().contains(query))
-          .toList();
-    }
-  });
-
-  print("Filtered Members: $filteredMembers");
-}
-
-
-  /// Select a member
-  void _selectMember(String member) {
-    if (!widget.selectedMembers.contains(member)) {
-      widget.selectedMembers.add(member);
-    }
-    Navigator.pop(context, widget.selectedMembers);
+  /// Navigate to group details
+  void _viewGroupDetails(Map<String, dynamic> group) {
+    FocusScope.of(context).unfocus();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GroupDetailScreen(
+          groupId: group["id"],
+          title: group["title"],
+          description: group["description"],
+          members: group["members"],
+          category: group["category"],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Search Member"),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Search Field
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: AppColors.gray),
-                hintText: "Search for members...",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-            ),
-            SizedBox(height: 16),
-
-            // Show loading indicator
-            if (isLoading) Center(child: CircularProgressIndicator()),
-
-            // Show filtered results
-            Expanded(
-              child: filteredMembers.isEmpty && !isLoading
-                  ? Center(child: Text(""))
-                  : ListView.builder(
-                      itemCount: filteredMembers.length,
-                      itemBuilder: (context, index) {
-                        print(
-                            "Displaying: ${filteredMembers[index]}"); 
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: AppColors.mainShadow,
-                            child: Icon(Icons.person, color: Colors.white),
-                          ),
-                          title: Text(filteredMembers[index],
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          onTap: () => _selectMember(filteredMembers[index]),
-                        );
-                      },
+      appBar: CustomAppBar(title: "Search Groups"),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Search Field
+              // Search Field
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.mainShadow,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: searchController,
+                  style: TextStyle(color: Colors.white),
+                  cursorColor: AppColors.white,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: AppColors.gray),
+                    hintText: "Search for groups by title...",
+                    hintStyle: TextStyle(color: Colors.white60),
+                    border: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: AppColors.mainShadow),
                     ),
-            )
-          ],
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: AppColors.main, width: 1.5),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              // Show loading indicator
+              if (isLoading)
+                Center(
+                    child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                )),
+
+              // Show filtered results
+              Expanded(
+                child: filteredGroups.isEmpty && !isLoading
+                    ? Center(
+                        child: Text(
+                        searchController.text.isEmpty
+                            ? "Enter a group name to search"
+                            : "No groups found",
+                        style: TextStyle(color: Colors.white),
+                      ))
+                    : ListView.builder(
+                        itemCount: filteredGroups.length,
+                        itemBuilder: (context, index) {
+                          var group = filteredGroups[index];
+                          return Card(
+                              color: AppColors.mainShadow,
+                              margin: EdgeInsets.only(bottom: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: AppColors.main,
+                                  child: Text(
+                                    CategoryUtils.getCategoryEmoji(
+                                        group["category"]),
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                                title: Text(
+                                  group["title"],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      group["description"],
+                                      style: TextStyle(color: Colors.white70),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "Created by: ${group["createdBy"]}",
+                                      style: TextStyle(
+                                        color: AppColors.main,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: Text(
+                                  "${group["members"].length} members",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                                onTap: () => _viewGroupDetails(group),
+                              ));
+                        },
+                      ),
+              )
+            ],
+          ),
         ),
       ),
     );

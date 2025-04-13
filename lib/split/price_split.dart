@@ -630,7 +630,7 @@
 //                               TextStyle(fontSize: 16, color: Colors.white70)),
 //                       SizedBox(height: 8),
 //                       Text(
-//                           "₹${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
+//                           "Rs.${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
 //                           style: TextStyle(
 //                               fontSize: 28,
 //                               fontWeight: FontWeight.bold,
@@ -697,7 +697,7 @@
 //                                   mainAxisSize: MainAxisSize.min,
 //                                   children: [
 //                                     Text(
-//                                       "₹${(expense['price'] as num).toStringAsFixed(2)}",
+//                                       "Rs.${(expense['price'] as num).toStringAsFixed(2)}",
 //                                       style: TextStyle(
 //                                           color: Colors.amber,
 //                                           fontWeight: FontWeight.bold,
@@ -1398,7 +1398,7 @@
 //                       pw.Text('Member: ${member == 'All' ? 'All Members' : member}',
 //                         style: pw.TextStyle(fontSize: 14)),
 //                       pw.SizedBox(height: 5),
-//                       pw.Text('Total Amount: ₹${totalAmount.toStringAsFixed(2)}',
+//                       pw.Text('Total Amount: Rs.${totalAmount.toStringAsFixed(2)}',
 //                         style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
 //                     ],
 //                   ),
@@ -1435,7 +1435,7 @@
 //                         ),
 //                         pw.Padding(
 //                           padding: pw.EdgeInsets.all(5),
-//                           child: pw.Text('Amount (₹)',
+//                           child: pw.Text('Amount (Rs.)',
 //                             style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
 //                         ),
 //                       ]
@@ -1495,7 +1495,7 @@
 //                         ),
 //                         pw.Padding(
 //                           padding: pw.EdgeInsets.all(5),
-//                           child: pw.Text('₹${totalAmount.toStringAsFixed(2)}',
+//                           child: pw.Text('Rs.${totalAmount.toStringAsFixed(2)}',
 //                             style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
 //                         ),
 //                       ]
@@ -1996,7 +1996,7 @@
 //                         ),
 //                         SizedBox(height: 8),
 //                         Text(
-//                           "₹${totalBill.toStringAsFixed(2)}",
+//                           "Rs.${totalBill.toStringAsFixed(2)}",
 //                           style: TextStyle(
 //                             color: Colors.white,
 //                             fontSize: 28,
@@ -2093,7 +2093,7 @@
 //                                         keyboardType: TextInputType.numberWithOptions(decimal: true),
 //                                         style: TextStyle(color: Colors.white),
 //                                         decoration: InputDecoration(
-//                                           prefixText: '₹',
+//                                           prefixText: 'Rs.',
 //                                           prefixStyle: TextStyle(color: Colors.white70),
 //                                           hintText: '0.00',
 //                                           hintStyle: TextStyle(color: Colors.white38),
@@ -2184,7 +2184,7 @@
 //                                 style: TextStyle(color: Colors.white),
 //                               ),
 //                               Text(
-//                                 "₹${calculatePerPersonAmount().toStringAsFixed(2)}",
+//                                 "Rs.${calculatePerPersonAmount().toStringAsFixed(2)}",
 //                                 style: TextStyle(
 //                                   color: AppColors.main,
 //                                   fontWeight: FontWeight.bold,
@@ -2210,7 +2210,7 @@
 //                                       style: TextStyle(color: Colors.white),
 //                                     ),
 //                                     Text(
-//                                       "₹${amount.toStringAsFixed(2)}",
+//                                       "Rs.${amount.toStringAsFixed(2)}",
 //                                       style: TextStyle(
 //                                         color: AppColors.main,
 //                                         fontWeight: FontWeight.bold,
@@ -2388,7 +2388,7 @@
 //                               TextStyle(fontSize: 16, color: Colors.white70)),
 //                       SizedBox(height: 8),
 //                       Text(
-//                           "₹${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
+//                           "Rs.${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
 //                           style: TextStyle(
 //                               fontSize: 28,
 //                               fontWeight: FontWeight.bold,
@@ -2455,7 +2455,7 @@
 //                                   mainAxisSize: MainAxisSize.min,
 //                                   children: [
 //                                     Text(
-//                                       "₹${(expense['price'] as num).toStringAsFixed(2)}",
+//                                       "Rs.${(expense['price'] as num).toStringAsFixed(2)}",
 //                                       style: TextStyle(
 //                                           color: Colors.amber,
 //                                           fontWeight: FontWeight.bold,
@@ -3271,7 +3271,7 @@ class _PriceScreenState extends State<PriceScreen> {
                               TextStyle(fontSize: 16, color: Colors.white70)),
                       SizedBox(height: 8),
                       Text(
-                          "₹${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
+                          "Rs.${selectedFilter == 'All' ? totalAmount.toStringAsFixed(2) : filteredAmount.toStringAsFixed(2)}",
                           style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -3338,7 +3338,7 @@ class _PriceScreenState extends State<PriceScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      "₹${(expense['price'] as num).toStringAsFixed(2)}",
+                                      "Rs.${(expense['price'] as num).toStringAsFixed(2)}",
                                       style: TextStyle(
                                           color: Colors.amber,
                                           fontWeight: FontWeight.bold,
@@ -3405,53 +3405,6 @@ class _PriceScreenState extends State<PriceScreen> {
           ),
         ],
       ),
-    );
-  }
-
-// Add this method to your class for the receipt functionality
-  void _showReceiptView() {
-    // Implement functionality for viewing receipts or statements
-    // This could be a summary view, reports, etc.
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.mainShadow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Expense Summary",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 20),
-              // Add your receipt/statement content here
-              Text(
-                "Total Spent: ₹${totalAmount.toStringAsFixed(2)}",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              // Add more summary content as needed
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style:
-                    ElevatedButton.styleFrom(backgroundColor: AppColors.main),
-                child: Text("Close", style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

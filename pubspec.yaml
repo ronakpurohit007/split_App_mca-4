@@ -44,7 +44,7 @@ dependencies:
   intl: ^0.20.2
   printing: ^5.14.2
   google_fonts: ^4.0.3
-  pdf_widgets_google_fonts: ^0.0.5
+  share_plus: ^10.1.4
 #  google_sign_in: ^5.0.0
 
 dev_dependencies:
