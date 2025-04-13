@@ -148,7 +148,7 @@ class _ExpenseHistoryScreenState extends State<ExpenseHistoryScreen> {
   String _formatTimestamp(dynamic timestamp) {
     if (timestamp is Timestamp) {
       final date = timestamp.toDate();
-      return "${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+      return "${date.day}-/${date.month}-/${date.year}_${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
     }
     return "Unknown date";
   }
