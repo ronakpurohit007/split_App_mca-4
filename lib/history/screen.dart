@@ -6,6 +6,7 @@ import 'package:login/widgets/AppBar.dart';
 import 'package:login/widgets/colors.dart';
 import 'package:login/widgets/logger.dart';
 import 'package:login/Services/authentication.dart';
+import 'package:open_file/open_file.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -152,208 +153,212 @@ class _ExpenseHistoryScreenState extends State<ExpenseHistoryScreen> {
     return "Unknown date";
   }
 
-  Future<void> _printExpenseDetails() async {
-    if (userExpenses.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No expenses to print')),
-      );
-      return;
-    }
 
-    setState(() {
-      isPrinting = true;
-    });
 
-    try {
-      final pdf = pw.Document();
-      final totalAmount = userExpenses.fold<double>(
-          0,
-          (sum, item) =>
-              sum +
-              (item['price'] is double
-                  ? item['price']
-                  : (item['price'] as num).toDouble()));
+Future<void> _printExpenseDetails() async {
+  if (userExpenses.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('No expenses to print')),
+    );
+    return;
+  }
 
-      // Format the current date for the report
-      final now = DateTime.now();
-      final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(now);
+  setState(() {
+    isPrinting = true;
+  });
 
-      // Create PDF document
-      pdf.addPage(
-        pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          margin: pw.EdgeInsets.all(32),
-          build: (pw.Context context) {
-            return [
-              pw.Header(
-                level: 0,
-                child: pw.Text('Expense History Report',
-                    style: pw.TextStyle(
-                        fontSize: 24, fontWeight: pw.FontWeight.bold)),
+  try {
+    final pdf = pw.Document();
+    final totalAmount = userExpenses.fold<double>(
+        0,
+        (sum, item) => sum +
+            (item['price'] is double
+                ? item['price']
+                : (item['price'] as num).toDouble()));
+
+    // Format the current date and time for the report
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyyMMdd_HHmmss').format(now); // Format to avoid slashes
+
+    // Create PDF document
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.all(32),
+        build: (pw.Context context) {
+          return [
+            pw.Header(
+              level: 0,
+              child: pw.Text('Expense History Report',
+                  style: pw.TextStyle(
+                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            ),
+            pw.SizedBox(height: 8),
+            pw.Text('Generated on: $formattedDate'),
+            pw.Text('User: $userName'),
+            pw.SizedBox(height: 16),
+            pw.Container(
+              padding: pw.EdgeInsets.all(10),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.amber50,
+                border: pw.Border.all(color: PdfColors.amber),
+                borderRadius: pw.BorderRadius.circular(5),
               ),
-              pw.SizedBox(height: 8),
-              pw.Text('Generated on: $formattedDate'),
-              pw.Text('User: $userName'),
-              pw.SizedBox(height: 16),
-              pw.Container(
-                padding: pw.EdgeInsets.all(10),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.amber50,
-                  border: pw.Border.all(color: PdfColors.amber),
-                  borderRadius: pw.BorderRadius.circular(5),
-                ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Total Spending:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Rs.${totalAmount.toStringAsFixed(2)}',
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 16,
+                          color: PdfColors.amber900)),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('Expense Details (${userExpenses.length} items)',
+                style: pw.TextStyle(
+                    fontSize: 16, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 10),
+            // Table header
+            pw.Table(
+              border: pw.TableBorder.all(color: PdfColors.grey400),
+              columnWidths: {
+                0: pw.FlexColumnWidth(2), // Title
+                1: pw.FlexColumnWidth(1.5), // Group
+                2: pw.FlexColumnWidth(1.5), // Date
+                3: pw.FlexColumnWidth(1), // Amount
+              },
+              children: [
+                pw.TableRow(
+                  decoration: pw.BoxDecoration(color: PdfColors.grey200),
                   children: [
-                    pw.Text('Total Spending:',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('Rs.${totalAmount.toStringAsFixed(2)}',
-                        style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                            fontSize: 16,
-                            color: PdfColors.amber900)),
+                    pw.Padding(
+                      padding: pw.EdgeInsets.all(8),
+                      child: pw.Text('Title',
+                          style:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: pw.EdgeInsets.all(8),
+                      child: pw.Text('Group',
+                          style:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: pw.EdgeInsets.all(8),
+                      child: pw.Text('Date',
+                          style:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: pw.EdgeInsets.all(8),
+                      child: pw.Text('Amount',
+                          style:
+                              pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
                   ],
                 ),
-              ),
-              pw.SizedBox(height: 20),
-              pw.Text('Expense Details (${userExpenses.length} items)',
-                  style: pw.TextStyle(
-                      fontSize: 16, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              // Table header
-              pw.Table(
-                border: pw.TableBorder.all(color: PdfColors.grey400),
-                columnWidths: {
-                  0: pw.FlexColumnWidth(2), // Title
-                  1: pw.FlexColumnWidth(1.5), // Group
-                  2: pw.FlexColumnWidth(1.5), // Date
-                  3: pw.FlexColumnWidth(1), // Amount
-                },
-                children: [
-                  pw.TableRow(
-                    decoration: pw.BoxDecoration(color: PdfColors.grey200),
+                // Table data
+                ...userExpenses.map((expense) {
+                  final date = (expense['createdAt'] as Timestamp).toDate();
+                  final formattedDate =
+                      DateFormat('dd/MM/yyyy HH:mm').format(date);
+
+                  return pw.TableRow(
                     children: [
                       pw.Padding(
                         padding: pw.EdgeInsets.all(8),
-                        child: pw.Text('Title',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        child: pw.Text(expense['title']),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(8),
-                        child: pw.Text('Group',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        child: pw.Text(expense['groupTitle']),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(8),
-                        child: pw.Text('Date',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        child: pw.Text(formattedDate),
                       ),
                       pw.Padding(
                         padding: pw.EdgeInsets.all(8),
-                        child: pw.Text('Amount',
-                            style:
-                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        child: pw.Text(
+                            'Rs.${(expense['price'] as num).toStringAsFixed(2)}',
+                            textAlign: pw.TextAlign.right),
                       ),
                     ],
-                  ),
-                  // Table data
-                  ...userExpenses.map((expense) {
-                    final date = (expense['createdAt'] as Timestamp).toDate();
-                    final formattedDate =
-                        DateFormat('dd/MM/yyyy HH:mm').format(date);
+                  );
+                }).toList(),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+            pw.Footer(
+              title: pw.Text(
+                  'This is an automatically generated report of your expenses.',
+                  style: pw.TextStyle(
+                      fontSize: 10, fontStyle: pw.FontStyle.italic)),
+            ),
+          ];
+        },
+      ),
+    );
 
-                    return pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: pw.EdgeInsets.all(8),
-                          child: pw.Text(expense['title']),
-                        ),
-                        pw.Padding(
-                          padding: pw.EdgeInsets.all(8),
-                          child: pw.Text(expense['groupTitle']),
-                        ),
-                        pw.Padding(
-                          padding: pw.EdgeInsets.all(8),
-                          child: pw.Text(formattedDate),
-                        ),
-                        pw.Padding(
-                          padding: pw.EdgeInsets.all(8),
-                          child: pw.Text(
-                              'Rs.${(expense['price'] as num).toStringAsFixed(2)}',
-                              textAlign: pw.TextAlign.right),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ],
-              ),
-              pw.SizedBox(height: 20),
-              pw.Footer(
-                title: pw.Text(
-                    'This is an automatically generated report of your expenses.',
-                    style: pw.TextStyle(
-                        fontSize: 10, fontStyle: pw.FontStyle.italic)),
-              ),
-            ];
-          },
-        ),
-      );
+    // Use a more reliable approach to save the file
+    Directory? directory;
 
-      // Use a more reliable approach to save the file
-      Directory? directory;
-
-      // Try to get the Downloads directory first
-      try {
-        directory = Directory('/storage/emulated/0/Download');
-        if (!await directory.exists()) {
-          directory =
-              await getExternalStorageDirectory(); // Fallback to app external directory
-        }
-      } catch (e) {
-        // If we can't access external storage, use app documents directory
-        directory = await getApplicationDocumentsDirectory();
+    // Try to get the Downloads directory first
+    try {
+      directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) {
+        directory = await getExternalStorageDirectory(); // Fallback to app external directory
       }
-
-      if (directory == null) {
-        throw Exception("Could not access any storage directory");
-      }
-
-      // Create a filename with timestamp
-      final String fileName =
-          'expense_history_${now.millisecondsSinceEpoch}.pdf';
-      final String filePath = '${directory.path}/$fileName';
-
-      // Save the PDF file
-      final File file = File(filePath);
-      await file.writeAsBytes(await pdf.save());
-
-      // Show success message with file location
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('PDF saved to: $filePath'),
-          duration: Duration(seconds: 5),
-          action: SnackBarAction(
-            label: 'OK',
-            onPressed: () {},
-          ),
-        ),
-      );
-
-      logger.d("PDF successfully saved to: $filePath");
     } catch (e) {
-      logger.e("Error generating PDF: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to generate expense report: $e')),
-      );
-    } finally {
-      setState(() {
-        isPrinting = false;
-      });
+      // If we can't access external storage, use app documents directory
+      directory = await getApplicationDocumentsDirectory();
     }
+
+    if (directory == null) {
+      throw Exception("Could not access any storage directory");
+    }
+
+    // Create a filename with formatted date and time
+    final String fileName = 'expense_history_$formattedDate.pdf';
+    final String filePath = '${directory.path}/$fileName';
+
+    // Save the PDF file
+    final File file = File(filePath);
+    await file.writeAsBytes(await pdf.save());
+
+    // Show success message with file location
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('PDF saved to: $filePath'),
+        duration: Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    // Open the file after saving it
+    await OpenFile.open(filePath);
+
+    logger.d("PDF successfully saved to: $filePath");
+
+  } catch (e) {
+    logger.e("Error generating PDF: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to generate expense report: $e')),
+    );
+  } finally {
+    setState(() {
+      isPrinting = false;
+    });
   }
+}
+
 
   void _showExpenseDetailDialog(Map<String, dynamic> expense) {
     showDialog(
